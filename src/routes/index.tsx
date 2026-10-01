@@ -6,6 +6,7 @@ import {
   plazoMinimo, puntaje, soles, tramo,
   type Antiguedad, type Cliente, type DatosFinancieros, type Decision, type Historial, type TipoTrabajo,
 } from "@/lib/credit";
+import { useSesion } from "@/lib/auth";
 import { construir, guardarEvaluacion } from "@/lib/storage";
 
 export const Route = createFileRoute("/")({
@@ -22,15 +23,6 @@ export const Route = createFileRoute("/")({
 
 type Paso = "solicitud" | "resultado" | "simulador" | "confirmar";
 
-const CASOS: { label: string; c: Cliente; d: DatosFinancieros }[] = [
-  { label: "María F.", c: { nombre: "María Fernández Quispe", dni: "45872163", telefono: "987 654 321", direccion: "Jr. Junín 452, Huancayo" },
-    d: { ingreso: 1200, gastos: 400, tipoTrabajo: "independiente", antiguedad: "1a3", referencias: 1, historial: "nuevo" } },
-  { label: "Carlos R.", c: { nombre: "Carlos Ruiz Mamani", dni: "41236598", telefono: "954 112 778", direccion: "Av. Los Héroes 1180, SJM" },
-    d: { ingreso: 1800, gastos: 600, tipoTrabajo: "dependiente", antiguedad: "mas3", referencias: 2, historial: "bueno" } },
-  { label: "Juan P.", c: { nombre: "Juan Pérez Condori", dni: "70451289", telefono: "923 448 190", direccion: "Calle Lima 233, Juliaca" },
-    d: { ingreso: 900, gastos: 500, tipoTrabajo: "independiente", antiguedad: "menos1", referencias: 0, historial: "moroso" } },
-];
-
 const TRAMO_STYLE = {
   revision: "bg-bad-soft border-accent text-accent",
   t20: "bg-warn-soft border-warn text-ink",
@@ -45,8 +37,9 @@ function Page() {
   const [datos, setDatos] = useState<DatosFinancieros>({ ingreso: 0, gastos: 0, tipoTrabajo: "dependiente", antiguedad: "1a3", referencias: 0, historial: "nuevo" });
   const [prod, setProd] = useState<string | null>(null);
   const [plazo, setPlazo] = useState<number | null>(null);
-  const [asesor, setAsesor] = useState("");
-  const [tienda, setTienda] = useState("");
+  const { sesion } = useSesion();
+  const asesor = sesion ? `${sesion.nombre} (${sesion.codigo})` : "";
+  const tienda = sesion?.tienda?.codigo ?? "";
   const [guardando, setGuardando] = useState(false);
 
   const disp = disponible(datos);
@@ -73,12 +66,6 @@ function Page() {
 
       {paso === "solicitud" && (
         <div className="grid gap-5">
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Cargar caso de prueba:</span>
-            {CASOS.map((k) => (
-              <button key={k.label} onClick={() => { setCliente(k.c); setDatos(k.d); }} className="rounded-full bg-secondary px-4 py-2 font-semibold text-secondary-foreground">{k.label}</button>
-            ))}
-          </div>
           <Card>
             <h2 className="mb-4 text-2xl font-bold">Datos del cliente</h2>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -248,8 +235,8 @@ function Page() {
           <Card>
             <h2 className="mb-4 text-2xl font-bold">Datos del asesor</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <F label="Nombre del asesor"><input className="field" value={asesor} onChange={(e) => setAsesor(e.target.value)} placeholder="Luis Ccori" /></F>
-              <F label="Código de tienda"><input className="field" value={tienda} onChange={(e) => setTienda(e.target.value.toUpperCase())} placeholder="LIM-034" /></F>
+              <R k="Asesor" v={asesor} />
+              <R k="Tienda" v={sesion?.tienda ? `${sesion.tienda.codigo} · ${sesion.tienda.nombre}` : ""} />
             </div>
           </Card>
           {(() => {
