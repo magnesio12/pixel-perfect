@@ -85,7 +85,7 @@ src/
 
 **`src/lib/auth.ts` — sesiones, asesores y tiendas.** Listas iniciales en `SEED_USERS` y `SEED_TIENDAS`: al entrar por primera vez cargan los usuarios y tiendas de la tabla de arriba. Cambiar ahí para usar datos reales.
 
-**`src/lib/credito` — nota:** ninguna. Es `credit.ts`.
+**`src/routes/index.tsx` — la pantalla de evaluación.** El flujo paso a paso y la validación del formulario (todos los campos obligatorios; DNI de 8 dígitos y teléfono de 9 dígitos).
 
 ---
 
