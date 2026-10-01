@@ -158,6 +158,7 @@ Datos ficticios para rellenar rápido el formulario de la solicitud de crédito 
 | Teléfono       | `987654321`                      |
 | Dirección      | Av. Los Próceres 450, SJM, Lima  |
 | Ingreso mensual| S/ 3 500                         |
+| Gastos fijos   | S/ 1 200                         |
 | Independiente  | No (dependiente)                 |
 | Antigüedad     | 6 años                           |
 | Referencias    | 3                                |
@@ -172,6 +173,7 @@ Datos ficticios para rellenar rápido el formulario de la solicitud de crédito 
 | Teléfono       | `951234567`                      |
 | Dirección      | Jr. Huancavelica 210, Comas      |
 | Ingreso mensual| S/ 2 000                         |
+| Gastos fijos   | S/ 700                           |
 | Independiente  | Sí                               |
 | Antigüedad     | 2 años                           |
 | Referencias    | 1                                |
@@ -186,6 +188,7 @@ Datos ficticios para rellenar rápido el formulario de la solicitud de crédito 
 | Teléfono       | `912345678`                      |
 | Dirección      | Calle Real 88, Huancayo          |
 | Ingreso mensual| S/ 700                           |
+| Gastos fijos   | S/ 400                           |
 | Independiente  | No (dependiente)                 |
 | Antigüedad     | Menos de 1 año                   |
 | Referencias    | 0                                |
