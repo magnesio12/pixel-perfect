@@ -171,7 +171,7 @@ Datos ficticios para rellenar rápido el formulario de la solicitud de crédito 
 | DNI            | `08456712`                       |
 | Teléfono       | `951234567`                      |
 | Dirección      | Jr. Huancavelica 210, Comas      |
-| Ingreso mensual| S/ 1 400                         |
+| Ingreso mensual| S/ 2 000                         |
 | Independiente  | Sí                               |
 | Antigüedad     | 2 años                           |
 | Referencias    | 1                                |
