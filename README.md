@@ -49,6 +49,38 @@ Otros comandos útiles:
 
 > ⚠️ Este login es solo para organizar quién opera: los datos viven en el navegador del usuario, no hay seguridad real. Se reemplazará por autenticación del backend.
 
+### Qué está simulado (y qué no existe)
+
+Como todo corre en el navegador, estas funciones **simulan** su comportamiento real:
+
+- **Login y sesión**: se validan contra una lista local de usuarios; la sesión se guarda en el navegador y se pierde al borrar los datos. No hay seguridad real (se reemplazará por el backend).
+- **Guardado de datos**: cada evaluación se "guarda" en el propio navegador con una pequeña demora simulada, como si fuera un servidor. Cada navegador (y cada computadora) ve su propio historial; los datos no se comparten entre usuarios ni equipos.
+- **Delays de red**: las operaciones esperan ~150 ms para imitar la respuesta de un servidor.
+
+**No existe y no se envía nada hacia afuera**: no hay correos, ni pagos, ni mensajes de WhatsApp, ni conexión a ningún servicio externo. La app funciona 100% sin internet.
+
+### Datos de ejemplo y cómo reiniciarlos
+
+Al abrir la app por primera vez se cargan solos los **usuarios y tiendas de ejemplo** de la tabla de arriba. El **historial de evaluaciones empieza vacío**.
+
+Para volver todo al estado inicial (borrar evaluaciones, sesión y volver a cargar los datos de ejemplo), borra el localStorage del navegador:
+
+1. Abre la app y presiona **F12** (herramientas de desarrollo).
+2. Ve a la pestaña **Application** (Chrome/Edge) o **Almacenamiento** (Firefox).
+3. En el panel izquierdo: **Local Storage → http://localhost:8080** (o el dominio donde esté publicada).
+4. Clic derecho → **Clear / Borrar**, y recarga la página.
+
+También puedes borrar solo una parte, eliminando claves individuales:
+
+| Clave de localStorage     | Qué borra                                    |
+| ------------------------- | -------------------------------------------- |
+| `carsa.evaluaciones.v2`   | El historial de evaluaciones                 |
+| `carsa.sesion.v1`         | La sesión activa (vuelve a la pantalla de login) |
+| `carsa.asesores.v1`       | Los asesores (se recargan los de ejemplo)    |
+| `carsa.tiendas.v1`        | Las tiendas (se recargan las de ejemplo)     |
+
+> Atajos rápidos: en la consola de las herramientas de desarrollo, `localStorage.clear()` borra todo, o `localStorage.removeItem("carsa.evaluaciones.v2")` borra solo el historial.
+
 ---
 
 ## 3. Dónde está cada cosa
