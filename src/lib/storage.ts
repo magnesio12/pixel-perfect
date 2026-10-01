@@ -44,7 +44,7 @@ export function construir(
     id: nuevoId(), fecha: fecha.toISOString(), cliente, datos, puntaje: total, tramo: t.id,
     cuotaMaxima: cuotaMaxima(disp, t),
     producto: p ? { id: p.id, nombre: p.nombre, precio: p.precio } : null,
-    plazo, cuota: p && plazo ? cuota(p.precio, factor) : null, decision, asesor, tienda,
+    plazo, cuota: p && plazo ? cuota(p.precio, factor ?? 0) : null, decision, asesor, tienda,
   };
 }
 
