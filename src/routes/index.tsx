@@ -46,7 +46,7 @@ function Page() {
   const score = useMemo(() => puntaje(datos), [datos]);
   const t = tramo(score.total);
   const max = cuotaMaxima(Math.max(disp, 0), t);
-  const formOk = cliente.nombre.trim() && /^\d{8}$/.test(cliente.dni) && datos.ingreso > 0 && disp >= 0;
+  const formOk = cliente.nombre.trim() && /^\d{8}$/.test(cliente.dni) && /^\d{9}$/.test(cliente.telefono) && cliente.direccion.trim() && datos.ingreso > 0 && disp >= 0;
 
   const producto = PRODUCTOS.find((p) => p.id === prod) ?? null;
   const factor = PLAZOS.find((p) => p.meses === plazo)?.factor;
@@ -71,7 +71,7 @@ function Page() {
             <div className="grid gap-4 sm:grid-cols-2">
               <F label="Nombre completo"><input className="field" value={cliente.nombre} onChange={(e) => setCliente({ ...cliente, nombre: e.target.value })} placeholder="Ej. Rosa Huamán Torres" /></F>
               <F label="DNI (8 dígitos)"><input className="field" inputMode="numeric" maxLength={8} value={cliente.dni} onChange={(e) => setCliente({ ...cliente, dni: e.target.value.replace(/\D/g, "") })} placeholder="45872163" /></F>
-              <F label="Teléfono"><input className="field" inputMode="tel" value={cliente.telefono} onChange={(e) => setCliente({ ...cliente, telefono: e.target.value })} placeholder="987 654 321" /></F>
+              <F label="Teléfono (9 dígitos)"><input className="field" inputMode="numeric" maxLength={9} value={cliente.telefono} onChange={(e) => setCliente({ ...cliente, telefono: e.target.value.replace(/\D/g, "") })} placeholder="987654321" /></F>
               <F label="Dirección"><input className="field" value={cliente.direccion} onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })} placeholder="Jr. Junín 452, Huancayo" /></F>
             </div>
           </Card>
@@ -98,7 +98,7 @@ function Page() {
             {disp < 0 && <p className="mt-2 font-semibold text-accent">Los gastos superan al ingreso. Revisa los montos con el cliente.</p>}
           </Card>
           <button disabled={!formOk} onClick={() => setPaso("resultado")} className="btn w-full bg-primary text-primary-foreground">Calcular puntaje</button>
-          {!formOk && <p className="-mt-3 text-center text-sm text-muted-foreground">Completa nombre, DNI de 8 dígitos e ingreso para continuar.</p>}
+          {!formOk && <p className="-mt-3 text-center text-sm text-muted-foreground">Completa todos los campos: nombre, DNI de 8 dígitos, teléfono de 9 dígitos, dirección e ingreso.</p>}
         </div>
       )}
 
