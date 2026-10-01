@@ -142,3 +142,53 @@ La migración a futuro es directa porque:
 - `auth.ts` concentra la sesión, para sustituirla por autenticación real.
 
 No hay que rehacer pantallas ni lógica: solo cambiar de dónde salen los datos.
+
+---
+
+## 6. Clientes de ejemplo para probar la solicitud
+
+Datos ficticios para rellenar rápido el formulario de la solicitud de crédito (paso "Datos del cliente"). Todos cumplen las reglas del formulario: DNI de 8 dígitos, teléfono de 9 dígitos e ingreso mayor a 0.
+
+**Cliente 1 — puntaje alto (aprueba con mejor tramo)**
+
+| Campo          | Valor                            |
+| -------------- | -------------------------------- |
+| Nombre         | María Elena Quispe Flores        |
+| DNI            | `45781236`                       |
+| Teléfono       | `987654321`                      |
+| Dirección      | Av. Los Próceres 450, SJM, Lima  |
+| Ingreso mensual| S/ 3 500                         |
+| Independiente  | No (dependiente)                 |
+| Antigüedad     | 6 años                           |
+| Referencias    | 3                                |
+| Historial      | Bueno                            |
+
+**Cliente 2 — puntaje medio (tramo intermedio)**
+
+| Campo          | Valor                            |
+| -------------- | -------------------------------- |
+| Nombre         | Carlos Alberto Ríos Mendoza      |
+| DNI            | `08456712`                       |
+| Teléfono       | `951234567`                      |
+| Dirección      | Jr. Huancavelica 210, Comas      |
+| Ingreso mensual| S/ 2 000                         |
+| Independiente  | Sí                               |
+| Antigüedad     | 2 años                           |
+| Referencias    | 1                                |
+| Historial      | Nuevo                            |
+
+**Cliente 3 — puntaje bajo (va a revisión manual)**
+
+| Campo          | Valor                            |
+| -------------- | -------------------------------- |
+| Nombre         | Juan Pérez Sánchez               |
+| DNI            | `72345698`                       |
+| Teléfono       | `912345678`                      |
+| Dirección      | Calle Real 88, Huancayo          |
+| Ingreso mensual| S/ 700                           |
+| Independiente  | No (dependiente)                 |
+| Antigüedad     | Menos de 1 año                   |
+| Referencias    | 0                                |
+| Historial      | Moroso                           |
+
+> ⚠️ Son datos inventados solo para pruebas; no corresponden a personas reales y no se cargan solos en la app: hay que escribirlos en el formulario.
