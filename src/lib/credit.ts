@@ -115,11 +115,11 @@ export type Tramo = { id: "revision" | TramoId; label: string; pct: number };
 
 export function tramo(total: number, cfg = getConfig()): Tramo {
   const ts = [...cfg.tramos].sort((a, b) => a.min - b.min);
-  if (!ts.length || total < ts[0].min) return { id: "revision", label: "Revisión manual", pct: 0 };
+  if (!ts.length || total < ts[0]!.min) return { id: "revision", label: "Revisión manual", pct: 0 };
   let i = 0;
-  while (i + 1 < ts.length && total >= ts[i + 1].min) i++;
-  const t = ts[i];
-  const rango = i + 1 < ts.length ? `${t.min}–${ts[i + 1].min - 1}` : `${t.min}+`;
+  while (i + 1 < ts.length && total >= ts[i + 1]!.min) i++;
+  const t = ts[i]!;
+  const rango = i + 1 < ts.length ? `${t.min}–${ts[i + 1]!.min - 1}` : `${t.min}+`;
   return { id: t.id, label: `Tramo ${rango} · ${Math.round(t.pct * 1000) / 10}%`, pct: t.pct };
 }
 
