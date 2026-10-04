@@ -2,11 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Card, Shell } from "@/components/Shell";
 import {
-  ANTIG_LABEL, HIST_LABEL, PLAZOS, PRODUCTOS, TIPO_LABEL, cuota, cuotaMaxima, disponible,
+  ANTIG_LABEL, HIST_LABEL, TIPO_LABEL, plazos, productos, cuota, cuotaMaxima, disponible,
   plazoMinimo, puntaje, soles, tramo,
   type Antiguedad, type Cliente, type DatosFinancieros, type Decision, type Historial, type TipoTrabajo,
 } from "@/lib/credit";
-import { useSesion } from "@/lib/auth";
 import { construir, guardarEvaluacion } from "@/lib/storage";
 
 export const Route = createFileRoute("/")({
@@ -37,9 +36,10 @@ function Page() {
   const [datos, setDatos] = useState<DatosFinancieros>({ ingreso: 0, gastos: 0, tipoTrabajo: "dependiente", antiguedad: "1a3", referencias: 0, historial: "nuevo" });
   const [prod, setProd] = useState<string | null>(null);
   const [plazo, setPlazo] = useState<number | null>(null);
-  const { sesion } = useSesion();
-  const asesor = sesion ? `${sesion.nombre} (${sesion.codigo})` : "";
-  const tienda = sesion?.tienda?.codigo ?? "";
+  const [asesor, setAsesorRaw] = useState(() => (typeof window !== "undefined" ? localStorage.getItem("carsa.asesor") ?? "" : ""));
+  const [tienda, setTiendaRaw] = useState(() => (typeof window !== "undefined" ? localStorage.getItem("carsa.tienda") ?? "" : ""));
+  const setAsesor = (v: string) => { setAsesorRaw(v); try { localStorage.setItem("carsa.asesor", v); } catch { /* sin storage */ } };
+  const setTienda = (v: string) => { setTiendaRaw(v); try { localStorage.setItem("carsa.tienda", v); } catch { /* sin storage */ } };
   const [guardando, setGuardando] = useState(false);
 
   const disp = disponible(datos);
@@ -48,8 +48,8 @@ function Page() {
   const max = cuotaMaxima(Math.max(disp, 0), t);
   const formOk = cliente.nombre.trim() && /^\d{8}$/.test(cliente.dni) && /^\d{9}$/.test(cliente.telefono) && cliente.direccion.trim() && datos.ingreso > 0 && disp >= 0;
 
-  const producto = PRODUCTOS.find((p) => p.id === prod) ?? null;
-  const factor = PLAZOS.find((p) => p.meses === plazo)?.factor;
+  const producto = productos().find((p) => p.id === prod) ?? null;
+  const factor = plazos().find((p) => p.meses === plazo)?.factor;
   const cuotaSel = producto && factor ? cuota(producto.precio, factor) : null;
 
   async function decidir(decision: Decision) {
@@ -151,7 +151,7 @@ function Page() {
             <span className="font-display text-3xl font-black">{soles(max)}</span>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {PRODUCTOS.map((p) => {
+            {productos().map((p) => {
               const min = plazoMinimo(p.precio, max);
               return (
                 <button key={p.id} onClick={() => { setProd(p.id); setPlazo(min); }}
@@ -168,7 +168,7 @@ function Page() {
             <Card>
               <h3 className="mb-3 text-xl font-bold">{producto.nombre} · elige plazo</h3>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {PLAZOS.map((pl) => {
+                {plazos().map((pl) => {
                   const c = cuota(producto.precio, pl.factor);
                   const ok = c <= max;
                   return (
@@ -185,7 +185,7 @@ function Page() {
                 const min = plazoMinimo(producto.precio, max);
                 return (
                   <p className={`mt-4 rounded-lg p-3 font-semibold ${min ? "bg-ok-soft" : "bg-bad-soft text-accent"}`}>
-                    {min ? `Plazo mínimo sugerido: ${min} meses.` : `No califica para este producto: la cuota más baja (${soles(cuota(producto.precio, 0.055))} a 24 meses) supera tu cuota máxima de ${soles(max)}.`}
+                    {min ? `Plazo mínimo sugerido: ${min} meses.` : `No califica para este producto: la cuota más baja (${soles(cuota(producto.precio, plazos()[plazos().length - 1].factor))} a {plazos()[plazos().length - 1].meses} meses) supera tu cuota máxima de ${soles(max)}.`}
                   </p>
                 );
               })()}
@@ -198,12 +198,12 @@ function Page() {
             <h3 className="mb-3 text-xl font-bold">Comparativa completa</h3>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[480px] text-sm">
-                <thead><tr className="text-left text-muted-foreground"><th className="py-2">Producto</th>{PLAZOS.map((p) => <th key={p.meses} className="text-center">{p.meses}m</th>)}</tr></thead>
+                <thead><tr className="text-left text-muted-foreground"><th className="py-2">Producto</th>{plazos().map((p) => <th key={p.meses} className="text-center">{p.meses}m</th>)}</tr></thead>
                 <tbody>
-                  {PRODUCTOS.map((p) => (
+                  {productos().map((p) => (
                     <tr key={p.id} className="border-t">
                       <td className="py-2 font-semibold">{p.nombre}</td>
-                      {PLAZOS.map((pl) => { const c = cuota(p.precio, pl.factor); return (
+                      {plazos().map((pl) => { const c = cuota(p.precio, pl.factor); return (
                         <td key={pl.meses} className="p-1"><div className={`rounded-md py-2 text-center font-bold ${c <= max ? "bg-ok-soft text-ok" : "bg-bad-soft text-accent"}`}>{soles(c)}</div></td>
                       ); })}
                     </tr>
@@ -235,8 +235,8 @@ function Page() {
           <Card>
             <h2 className="mb-4 text-2xl font-bold">Datos del asesor</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <R k="Asesor" v={asesor} />
-              <R k="Tienda" v={sesion?.tienda ? `${sesion.tienda.codigo} · ${sesion.tienda.nombre}` : ""} />
+              <F label="Asesor (nombre y código)"><input className="field" value={asesor} onChange={(e) => setAsesor(e.target.value)} placeholder="Ej. Rosa Huamán (AS-0127)" /></F>
+              <F label="Tienda"><input className="field" value={tienda} onChange={(e) => setTienda(e.target.value)} placeholder="Ej. HYO-012 · Huancayo Centro" /></F>
             </div>
           </Card>
           {(() => {
