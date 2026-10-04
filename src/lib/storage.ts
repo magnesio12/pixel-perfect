@@ -71,7 +71,7 @@ export const TIENDAS_EJEMPLO = ["LIM-034 · San Juan de Miraflores", "LIM-021 ·
 function semilla(): Evaluacion[] {
   let s = 20260101;
   const r = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
-  const pick = <T,>(a: readonly T[]) => a[Math.floor(r() * a.length)];
+  const pick = <T,>(a: readonly T[]): T => a[Math.floor(r() * a.length)] as T;
   const prods = productos();
   const pls = plazos();
   const out: Evaluacion[] = [];
@@ -98,7 +98,7 @@ function semilla(): Evaluacion[] {
     const prod = pick(prods);
     const pl = pls.find((p) => cuota(prod.precio, p.factor) <= ev0.cuotaMaxima);
     const decision: Decision = pl ? (r() < 0.85 ? "aprobado" : "rechazado") : "rechazado";
-    const plazo = pl?.meses ?? pls[pls.length - 1].meses;
+    const plazo = pl?.meses ?? pls[pls.length - 1]!.meses;
     out.push({ ...construir(cliente, datos, decision, ev0.asesor, ev0.tienda, prod.id, plazo, fecha), id: ev0.id });
   }
   return out;

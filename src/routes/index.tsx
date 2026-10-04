@@ -186,7 +186,7 @@ function Page() {
                 const min = plazoMinimo(producto.precio, max);
                 return (
                   <p className={`mt-4 rounded-lg p-3 font-semibold ${min ? "bg-ok-soft" : "bg-bad-soft text-accent"}`}>
-                    {min ? `Plazo mínimo sugerido: ${min} meses.` : `No califica para este producto: la cuota más baja (${soles(cuota(producto.precio, plazos()[plazos().length - 1].factor))} a ${plazos()[plazos().length - 1].meses} meses) supera tu cuota máxima de ${soles(max)}.`}
+                    {min ? `Plazo mínimo sugerido: ${min} meses.` : `No califica para este producto: la cuota más baja (${soles(cuota(producto.precio, plazos()[plazos().length - 1]!.factor))} a ${plazos()[plazos().length - 1]!.meses} meses) supera tu cuota máxima de ${soles(max)}.`}
                   </p>
                 );
               })()}
