@@ -34,52 +34,53 @@ Otros comandos útiles:
 
 ## 2. Cómo usar la app
 
-1. **Iniciar sesión** con usuario y contraseña (usuarios de ejemplo abajo).
-2. **Elegir la tienda** en la que se va a operar.
-3. La barra superior muestra el **nombre del asesor, su código y la tienda activa**; desde ahí se puede cambiar de tienda o salir.
-4. **Nueva evaluación** (paso a paso): datos del cliente → resultado con puntaje y desglose → simulador de cuota → confirmar.
-5. **Historial**: filtra evaluaciones por fecha, decisión y asesor; exporta todo a JSON.
+1. **Nueva evaluación** (paso a paso): datos del cliente → resultado con puntaje y desglose → simulador de cuota → registro. En el registro el asesor escribe su nombre/código y la tienda (se recuerdan para la siguiente evaluación).
+2. **Historial**: filtra evaluaciones por fecha, decisión y asesor; exporta a JSON.
+3. **Administración** (`/admin`): solo para el área de créditos, protegida con clave. Permite ajustar la tabla de puntaje, los tramos y su % de cuota máxima, los plazos y sus tasas (factor), y el catálogo de productos. Los cambios se aplican a las evaluaciones nuevas.
 
-### Usuarios de ejemplo
+No hay login para asesores: la app se abre directo en la evaluación.
 
-| Usuario   | Contraseña  | Asesor              | Código  | Tiendas                          |
-| --------- | ----------- | ------------------- | ------- | -------------------------------- |
-| `lccori`  | `carsa123`  | Luis Ccori Ramos    | AS-0341 | San Juan de Miraflores, Comas    |
-| `rhuaman` | `carsa123`  | Rosa Huamán Torres  | AS-0127 | Huancayo Centro                  |
+### Clave de /admin y cómo cambiarla
 
-> ⚠️ Este login es solo para organizar quién opera: los datos viven en el navegador del usuario, no hay seguridad real. Se reemplazará por autenticación del backend.
+Clave actual: **`carsa-admin-2026`**.
+
+Para cambiarla, abre `src/routes/admin.tsx` y edita la constante al inicio del archivo:
+
+```ts
+const CLAVE_ADMIN = "carsa-admin-2026";
+```
+
+Guarda, vuelve a compilar/publicar y la nueva clave queda activa. El acceso se recuerda solo mientras la pestaña esté abierta.
+
+> ⚠️ Es una clave simple dentro del código: evita el acceso directo casual a /admin, pero no es seguridad real. Con backend se reemplazará por usuarios con permisos.
 
 ### Qué está simulado (y qué no existe)
 
-Como todo corre en el navegador, estas funciones **simulan** su comportamiento real:
+- **Guardado de datos**: evaluaciones y configuración se guardan en el propio navegador (localStorage) con una pequeña demora simulada (~120 ms), como si fuera un servidor. Cada navegador ve su propio historial.
+- **Clave de /admin**: validación local, sin servidor.
 
-- **Login y sesión**: se validan contra una lista local de usuarios; la sesión se guarda en el navegador y se pierde al borrar los datos. No hay seguridad real (se reemplazará por el backend).
-- **Guardado de datos**: cada evaluación se "guarda" en el propio navegador con una pequeña demora simulada, como si fuera un servidor. Cada navegador (y cada computadora) ve su propio historial; los datos no se comparten entre usuarios ni equipos.
-- **Delays de red**: las operaciones esperan ~150 ms para imitar la respuesta de un servidor.
+**No existe y no se envía nada hacia afuera**: no hay correos, ni pagos, ni WhatsApp, ni conexión a servicios externos. La app funciona 100% sin internet.
 
-**No existe y no se envía nada hacia afuera**: no hay correos, ni pagos, ni mensajes de WhatsApp, ni conexión a ningún servicio externo. La app funciona 100% sin internet.
+### Si el navegador bloquea el almacenamiento
+
+Si el navegador tiene bloqueado el almacenamiento local (modo incógnito estricto, cookies desactivadas), la app muestra un **aviso rojo** debajo de la barra superior indicando que no podrá guardar datos y cómo solucionarlo.
 
 ### Datos de ejemplo y cómo reiniciarlos
 
-Al abrir la app por primera vez se cargan solos los **usuarios y tiendas de ejemplo** de la tabla de arriba. El **historial de evaluaciones empieza vacío**.
+Al abrir la app por primera vez se precargan:
 
-Para volver todo al estado inicial (borrar evaluaciones, sesión y volver a cargar los datos de ejemplo), borra el localStorage del navegador:
+- **40 productos** en el catálogo.
+- **120 solicitudes históricas** en el historial (últimos 90 días, varios asesores y tiendas, con decisiones aprobadas, rechazadas y en revisión).
 
-1. Abre la app y presiona **F12** (herramientas de desarrollo).
-2. Ve a la pestaña **Application** (Chrome/Edge) o **Almacenamiento** (Firefox).
-3. En el panel izquierdo: **Local Storage → http://localhost:8080** (o el dominio donde esté publicada).
-4. Clic derecho → **Clear / Borrar**, y recarga la página.
+Para volver al estado inicial, borra el localStorage: **F12 → Application → Local Storage → el dominio de la app → Clear**, y recarga. Las 120 solicitudes se vuelven a generar.
 
-También puedes borrar solo una parte, eliminando claves individuales:
+| Clave de localStorage     | Qué borra                                              |
+| ------------------------- | ------------------------------------------------------ |
+| `carsa.evaluaciones.v3`   | El historial (se regeneran las 120 de ejemplo)         |
+| `carsa.config.v1`         | Ajustes hechos en /admin (vuelven los valores originales) |
+| `carsa.asesor` / `carsa.tienda` | Asesor y tienda recordados en el registro        |
 
-| Clave de localStorage     | Qué borra                                    |
-| ------------------------- | -------------------------------------------- |
-| `carsa.evaluaciones.v3`   | El historial de evaluaciones                 |
-| `carsa.sesion.v1`         | La sesión activa (vuelve a la pantalla de login) |
-| `carsa.asesores.v1`       | Los asesores (se recargan los de ejemplo)    |
-| `carsa.tiendas.v1`        | Las tiendas (se recargan las de ejemplo)     |
-
-> Atajos rápidos: en la consola de las herramientas de desarrollo, `localStorage.clear()` borra todo, o `localStorage.removeItem("carsa.evaluaciones.v3")` borra solo el historial.
+> Atajo: en la consola, `localStorage.clear()` borra todo.
 
 ---
 
@@ -89,59 +90,38 @@ También puedes borrar solo una parte, eliminando claves individuales:
 src/
 ├── routes/
 │   ├── __root.tsx          # Estructura general (título, fuentes, lang)
-│   ├── index.tsx           # Pantalla principal: evaluación paso a paso
-│   └── historial.tsx       # Historial con filtros y exportación JSON
+│   ├── index.tsx           # Evaluación paso a paso
+│   ├── historial.tsx       # Historial con filtros y exportación JSON
+│   └── admin.tsx           # Panel de administración (clave CLAVE_ADMIN)
 ├── components/
-│   ├── Shell.tsx           # Cascarón: login → selección de tienda → app
-│   └── ui/                 # Componentes de interfaz reutilizables (botones, inputs…)
+│   └── Shell.tsx           # Barra superior, navegación y aviso de almacenamiento
 ├── lib/
-│   ├── credit.ts           # ⭐ REGLAS DE NEGOCIO (pura, sin navegador ni servidor)
-│   ├── storage.ts          # Guardar/leer evaluaciones en localStorage
-│   ├── auth.ts             # Sesión, asesores y tiendas en localStorage
+│   ├── credit.ts           # ⭐ REGLAS DE NEGOCIO + configuración base (CONFIG_BASE, 40 productos)
+│   ├── storage.ts          # Evaluaciones en localStorage + generación de las 120 de ejemplo
 │   └── utils.ts            # Utilidades menores
-├── styles.css              # Colores y estilos globales (paleta oklch)
-└── router.tsx              # Configuración interna del enrutador
+└── styles.css              # Colores y estilos globales
 ```
 
-### Archivos clave
+**`src/lib/credit.ts`** — `CONFIG_BASE` contiene los valores originales: puntaje (ingreso disponible ≤800: 5, ≤1500: 15, más: 25; dependiente/pensionista 20, independiente 10; antigüedad 5/15/25; 5 pts por referencia; historial bueno 20, nuevo 0, moroso −10), tramos (`<40` revisión · `40–64` 20% · `65–84` 25% · `85+` 30%), plazos (6m 0.18, 12m 0.095, 18m 0.068, 24m 0.055) y el catálogo de 40 productos. Lo editado en /admin se guarda encima de estos valores.
 
-**`src/lib/credit.ts` — las reglas del negocio.** Aquí vive todo lo que un cambio de política comercial tocaría:
-
-- `PRODUCTOS`: catálogo con precios (Refrigeradora 250 L S/ 1 899, Televisor 55" S/ 2 299, Lavadora 16 kg S/ 1 499, Moto 150 cc S/ 5 800, Celular S/ 999).
-- `PLAZOS`: meses e intereses (6m 18%, 12m 9.5%, 18m 6.8%, 24m 5.5%).
-- Puntaje por criterios: ingreso disponible, independencia, antigüedad, referencias, historial de crédito.
-- Tramos de decisión por puntaje: `< 40` revisión manual · `40–64` hasta 20% · `65–84` hasta 25% · `85+` hasta 30%.
-- Cálculo de cuota máxima, cuota por plazo y flujo completo de evaluación.
-
-**`src/lib/storage.ts` — los datos guardados.** Evaluaciones en `carsa.evaluaciones.v3` (localStorage del navegador). Marcado con TODOs para cambiar a backend.
-
-**`src/lib/auth.ts` — sesiones, asesores y tiendas.** Listas iniciales en `SEED_USERS` y `SEED_TIENDAS`: al entrar por primera vez cargan los usuarios y tiendas de la tabla de arriba. Cambiar ahí para usar datos reales.
-
-**`src/routes/index.tsx` — la pantalla de evaluación.** El flujo paso a paso y la validación del formulario (todos los campos obligatorios; DNI de 8 dígitos y teléfono de 9 dígitos).
+**`src/lib/storage.ts`** — único punto de lectura/escritura de evaluaciones.
 
 ---
 
 ## 4. Cambios frecuentes
 
-- **Cambiar precios, plazos o puntajes** → `src/lib/credit.ts`.
-- **Agregar/quitar asesores o tiendas** → `SEED_USERS` / `SEED_TIENDAS` en `src/lib/auth.ts`.
-- **Cambiar colores o tipografía** → `src/styles.css`.
-- **Modificar el formulario del cliente** (campos obligatorios, DNI 8 dígitos, teléfono 9 dígitos) → `src/routes/index.tsx`.
-- **Cambiar el login** (usuarios y contraseñas) → `src/lib/auth.ts`.
-
-> Nota: como los datos están en localStorage del navegador, si ya hay evaluaciones guardadas y se cambia la clave de guardado (`carsa.evaluaciones.v3`), las anteriores no se verán.
+- **Puntajes, tramos, tasas o catálogo** → desde `/admin` (sin tocar código), o los valores base en `src/lib/credit.ts`.
+- **Clave de /admin** → `CLAVE_ADMIN` en `src/routes/admin.tsx`.
+- **Colores o tipografía** → `src/styles.css`.
+- **Formulario del cliente** (campos obligatorios, DNI 8 dígitos, teléfono 9 dígitos) → `src/routes/index.tsx`.
 
 ---
 
 ## 5. Preparado para backend
 
-La migración a futuro es directa porque:
-
-- `credit.ts` no toca el navegador: puede correr igual en un servidor.
-- `storage.ts` es el único punto de acceso a los datos (TODOs marcados para reemplazar por llamadas a la API).
-- `auth.ts` concentra la sesión, para sustituirla por autenticación real.
-
-No hay que rehacer pantallas ni lógica: solo cambiar de dónde salen los datos.
+- `credit.ts` no depende de pantallas: la lógica corre igual en un servidor; la configuración pasaría a una tabla.
+- `storage.ts` es el único punto de acceso a evaluaciones: basta reemplazar sus funciones por llamadas a la API.
+- La clave de /admin se reemplazaría por usuarios con rol de administrador.
 
 ---
 
