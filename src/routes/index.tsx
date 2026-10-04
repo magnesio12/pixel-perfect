@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, Shell } from "@/components/Shell";
 import {
   ANTIG_LABEL, HIST_LABEL, TIPO_LABEL, plazos, productos, cuota, cuotaMaxima, disponible,
@@ -36,8 +36,9 @@ function Page() {
   const [datos, setDatos] = useState<DatosFinancieros>({ ingreso: 0, gastos: 0, tipoTrabajo: "dependiente", antiguedad: "1a3", referencias: 0, historial: "nuevo" });
   const [prod, setProd] = useState<string | null>(null);
   const [plazo, setPlazo] = useState<number | null>(null);
-  const [asesor, setAsesorRaw] = useState(() => (typeof window !== "undefined" ? localStorage.getItem("carsa.asesor") ?? "" : ""));
-  const [tienda, setTiendaRaw] = useState(() => (typeof window !== "undefined" ? localStorage.getItem("carsa.tienda") ?? "" : ""));
+  const [asesor, setAsesorRaw] = useState("");
+  const [tienda, setTiendaRaw] = useState("");
+  useEffect(() => { try { setAsesorRaw(localStorage.getItem("carsa.asesor") ?? ""); setTiendaRaw(localStorage.getItem("carsa.tienda") ?? ""); } catch { /* sin storage */ } }, []);
   const setAsesor = (v: string) => { setAsesorRaw(v); try { localStorage.setItem("carsa.asesor", v); } catch { /* sin storage */ } };
   const setTienda = (v: string) => { setTiendaRaw(v); try { localStorage.setItem("carsa.tienda", v); } catch { /* sin storage */ } };
   const [guardando, setGuardando] = useState(false);
@@ -185,7 +186,7 @@ function Page() {
                 const min = plazoMinimo(producto.precio, max);
                 return (
                   <p className={`mt-4 rounded-lg p-3 font-semibold ${min ? "bg-ok-soft" : "bg-bad-soft text-accent"}`}>
-                    {min ? `Plazo mínimo sugerido: ${min} meses.` : `No califica para este producto: la cuota más baja (${soles(cuota(producto.precio, plazos()[plazos().length - 1].factor))} a {plazos()[plazos().length - 1].meses} meses) supera tu cuota máxima de ${soles(max)}.`}
+                    {min ? `Plazo mínimo sugerido: ${min} meses.` : `No califica para este producto: la cuota más baja (${soles(cuota(producto.precio, plazos()[plazos().length - 1].factor))} a ${plazos()[plazos().length - 1].meses} meses) supera tu cuota máxima de ${soles(max)}.`}
                   </p>
                 );
               })()}

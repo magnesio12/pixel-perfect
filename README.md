@@ -74,12 +74,12 @@ También puedes borrar solo una parte, eliminando claves individuales:
 
 | Clave de localStorage     | Qué borra                                    |
 | ------------------------- | -------------------------------------------- |
-| `carsa.evaluaciones.v2`   | El historial de evaluaciones                 |
+| `carsa.evaluaciones.v3`   | El historial de evaluaciones                 |
 | `carsa.sesion.v1`         | La sesión activa (vuelve a la pantalla de login) |
 | `carsa.asesores.v1`       | Los asesores (se recargan los de ejemplo)    |
 | `carsa.tiendas.v1`        | Las tiendas (se recargan las de ejemplo)     |
 
-> Atajos rápidos: en la consola de las herramientas de desarrollo, `localStorage.clear()` borra todo, o `localStorage.removeItem("carsa.evaluaciones.v2")` borra solo el historial.
+> Atajos rápidos: en la consola de las herramientas de desarrollo, `localStorage.clear()` borra todo, o `localStorage.removeItem("carsa.evaluaciones.v3")` borra solo el historial.
 
 ---
 
@@ -113,7 +113,7 @@ src/
 - Tramos de decisión por puntaje: `< 40` revisión manual · `40–64` hasta 20% · `65–84` hasta 25% · `85+` hasta 30%.
 - Cálculo de cuota máxima, cuota por plazo y flujo completo de evaluación.
 
-**`src/lib/storage.ts` — los datos guardados.** Evaluaciones en `carsa.evaluaciones.v2` (localStorage del navegador). Marcado con TODOs para cambiar a backend.
+**`src/lib/storage.ts` — los datos guardados.** Evaluaciones en `carsa.evaluaciones.v3` (localStorage del navegador). Marcado con TODOs para cambiar a backend.
 
 **`src/lib/auth.ts` — sesiones, asesores y tiendas.** Listas iniciales en `SEED_USERS` y `SEED_TIENDAS`: al entrar por primera vez cargan los usuarios y tiendas de la tabla de arriba. Cambiar ahí para usar datos reales.
 
@@ -129,7 +129,7 @@ src/
 - **Modificar el formulario del cliente** (campos obligatorios, DNI 8 dígitos, teléfono 9 dígitos) → `src/routes/index.tsx`.
 - **Cambiar el login** (usuarios y contraseñas) → `src/lib/auth.ts`.
 
-> Nota: como los datos están en localStorage del navegador, si ya hay evaluaciones guardadas y se cambia la clave de guardado (`carsa.evaluaciones.v2`), las anteriores no se verán.
+> Nota: como los datos están en localStorage del navegador, si ya hay evaluaciones guardadas y se cambia la clave de guardado (`carsa.evaluaciones.v3`), las anteriores no se verán.
 
 ---
 
